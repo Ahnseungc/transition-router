@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  /* 스와이프 드래그 피드백을 위한 설정 */
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 네이트비 스타일 슬라이드 애니메이션 */
+@supports (view-transition-name: none) {
+  /* 전진 네비게이션: 새 페이지 슬라이드 인 (오른쪽에서 왼쪽으로) */
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0.2;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* 전진 네비게이션: 이전 페이지 슬라이드 아웃 (왼쪽으로 사라짐) */
+  @keyframes slide-out-left {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-30%);
+      opacity: 0.2;
+    }
+  }
+
+  /* 뒤로가기: 현재 페이지 슬라이드 아웃 (오른쪽으로 사라짐) */
+  @keyframes slide-out-right {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0.2;
+    }
+  }
+
+  /* 뒤로가기: 이전 페이지 슬라이드 인 (왼쪽에서 들어옴) */
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-30%);
+      opacity: 0.2;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* 전진 네비게이션 (새 페이지 진입) - 기본값 */
+  ::view-transition-old(root) {
+    animation: 0.3s ease-in-out both slide-out-left;
+  }
+
+  ::view-transition-new(root) {
+    animation: 0.3s ease-in-out both slide-in-right;
+  }
+
+  /* 뒤로가기 네비게이션 - CSS 선택자로 처리 */
+  html[data-navigation="back"] ::view-transition-old(root) {
+    animation: 0.3s ease-in-out both slide-out-right !important;
+  }
+
+  html[data-navigation="back"] ::view-transition-new(root) {
+    animation: 0.3s ease-in-out both slide-in-left !important;
+  }
+}
+
+/* 스와이프 제스처 드래그 중 피드백 */
+html {
+  --swipe-progress: 0;
+}
+
+/* 스와이프 중 오버레이 효과 (선택사항) */
+body[style*="translateX"] {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  body[style*="translateX"] {
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+  }
+}
