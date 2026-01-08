@@ -81,18 +81,20 @@ body {
 
   /* 전진 네비게이션 (새 페이지 진입) - 기본값 */
   ::view-transition-old(root) {
-    animation: 0.3s ease-in-out both slide-out-left;
+    animation: 0.3s ease-in-out both slide-out-left !important;
   }
 
   ::view-transition-new(root) {
-    animation: 0.3s ease-in-out both slide-in-right;
+    animation: 0.3s ease-in-out both slide-in-right !important;
   }
 
-  /* 뒤로가기 네비게이션 - CSS 선택자로 처리 */
+  /* 뒤로가기 네비게이션 - CSS 선택자로 처리 (더 높은 우선순위) */
+  html[data-navigation="back"]::view-transition-old(root),
   html[data-navigation="back"] ::view-transition-old(root) {
     animation: 0.3s ease-in-out both slide-out-right !important;
   }
 
+  html[data-navigation="back"]::view-transition-new(root),
   html[data-navigation="back"] ::view-transition-new(root) {
     animation: 0.3s ease-in-out both slide-in-left !important;
   }

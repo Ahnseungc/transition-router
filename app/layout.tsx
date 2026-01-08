@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ViewTransitions } from "next-view-transitions";
 import { QueryProvider } from "./providers/QueryProvider";
+import { NavigationProvider } from "./providers/NavigationProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,61 +28,12 @@ export default function RootLayout({
   return (
     <ViewTransitions>
       <html lang="en">
-        <head>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-            (function() {
-              // 뒤로가기 감지 - 최소한의 클라이언트 사이드 로직
-              if (typeof window === 'undefined') return;
-              
-              // View Transition API intercept
-              if (document.startViewTransition) {
-                const originalStartViewTransition = document.startViewTransition;
-                document.startViewTransition = function(callback) {
-                  const isBack = window.__isBackNavigation;
-                  if (isBack) {
-                    document.documentElement.setAttribute('data-navigation', 'back');
-                  } else {
-                    document.documentElement.removeAttribute('data-navigation');
-                  }
-                  return originalStartViewTransition.call(document, callback);
-                };
-              }
-              
-              // PopState 이벤트 - 뒤로가기 감지
-              window.addEventListener('popstate', function() {
-                window.__isBackNavigation = true;
-                document.documentElement.setAttribute('data-navigation', 'back');
-                
-                // 애니메이션 후 정리
-                setTimeout(function() {
-                  document.documentElement.removeAttribute('data-navigation');
-                  window.__isBackNavigation = false;
-                }, 350);
-              }, { capture: true });
-              
-              // Link 클릭 - 전진 네비게이션
-              document.addEventListener('click', function(e) {
-                var target = e.target;
-                var link = target.closest('a[href]');
-                var button = target.closest('button');
-                var isBackButton = button && button.getAttribute('aria-label') && button.getAttribute('aria-label').includes('뒤로');
-                
-                if (link && !isBackButton) {
-                  window.__isBackNavigation = false;
-                  document.documentElement.removeAttribute('data-navigation');
-                }
-              }, true);
-            })();
-          `,
-            }}
-          />
-        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <QueryProvider>{children}</QueryProvider>
+          <NavigationProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </NavigationProvider>
         </body>
       </html>
     </ViewTransitions>

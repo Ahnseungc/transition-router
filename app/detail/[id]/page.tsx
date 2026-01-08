@@ -97,11 +97,29 @@ export default function DetailPage({
   }, [params]);
 
   const handleBack = () => {
-    // 인라인 스크립트가 popstate 이벤트를 감지하여 처리
-    if (typeof window !== "undefined") {
-      window.__isBackNavigation = true;
-      document.documentElement.setAttribute("data-navigation", "back");
-    }
+    if (typeof window === "undefined") return;
+
+    // 뒤로가기 플래그 설정
+    window.__isBackNavigation = true;
+    const root = document.documentElement;
+    root.setAttribute("data-navigation", "back");
+
+    // 여러 프레임에 걸쳐 속성 유지 (View Transition 시작 전까지)
+    let frameCount = 0;
+    const maxFrames = 30;
+
+    const ensureAttribute = () => {
+      if (frameCount < maxFrames && window.__isBackNavigation) {
+        if (!root.hasAttribute("data-navigation")) {
+          root.setAttribute("data-navigation", "back");
+        }
+        frameCount++;
+        requestAnimationFrame(ensureAttribute);
+      }
+    };
+    requestAnimationFrame(ensureAttribute);
+
+    // router.back() 호출
     router.back();
   };
 
